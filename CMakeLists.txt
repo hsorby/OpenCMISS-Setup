@@ -4,7 +4,7 @@ project(OpenCMISS-Setup)
 
 include(ExternalProject)
 
-set(OPENCMISS_MULTIUSER FALSE CACHE BOOL "Setup for a multi-user installation, multi-user installations only setup the modules and dependencies.")
+set(OPENCMISS_MULTIUSER FALSE CACHE BOOL "Setup for a multi-user installation, multi-user installations only sets up the modules and dependencies.")
 set(OPENCMISS_INDEPENDENT FALSE CACHE BOOL "Setup with independent locations for libraries, dependencies, and modules")
 set(OPENCMISS_VERSION "develop" CACHE STRING "The branch or tag to setup.")
 
@@ -22,7 +22,9 @@ endif ()
 
 if (OPENCMISS_MULTIUSER)
   unset(OPENCMISS_MULTICONFIG CACHE)
+  set(INDEPENDENT_ROOTS MODULES DEPENDENCIES)
 else ()
+  set(INDEPENDENT_ROOTS LIBRARIES MODULES DEPENDENCIES)
   set(OPENCMISS_MULTICONFIG TRUE CACHE BOOL "Setup for a multi-config installation, setting to False sets up a fixed compiler and MPI installation.")
 endif ()
 
@@ -59,7 +61,7 @@ if (DEFINED OPENCMISS_ROOT)
 		list(APPEND ERROR_MSG "OpenCMISS root location '${OPENCMISS_ROOT}' does not exist")
 	endif ()
 else ()
-	foreach (ROOT LIBRARIES MODULES DEPENDENCIES)
+	foreach (ROOT ${INDEPENDENT_ROOTS})
 		if (NOT EXISTS ${OPENCMISS_${ROOT}_ROOT})
 			set(VALID_CONFIG FALSE)
 			list(APPEND ERROR_MSG "${ROOT} root location '${OPENCMISS_${ROOT}_ROOT}' does not exist")
@@ -76,6 +78,10 @@ if (NOT VALID_CONFIG)
 		message(SEND_ERROR "${msg}")
 	endforeach ()
 	message(FATAL_ERROR "Invalid configuration.")
+endif ()
+
+if (DEFINED OPENCMISS_ROOT)
+else ()
 endif ()
 #ExternalProject_Add(setup-manage
 #  ${DOWNLOAD_CMD}

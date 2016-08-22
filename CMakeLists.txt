@@ -4,6 +4,14 @@ project(OpenCMISS-Setup)
 
 include(ExternalProject)
 
+mark_as_advanced(QT_QMAKE_EXECUTABLE)
+if (APPLE)
+mark_as_advanced(CMAKE_OSX_ARCHITECTURES)
+mark_as_advanced(CMAKE_CODEBLOCKS_EXECUTABLE)
+mark_as_advanced(CMAKE_OSX_DEPLOYMENT_TARGET)
+mark_as_advanced(CMAKE_OSX_SYSROOT)
+endif()
+
 set(OPENCMISS_MULTIUSER FALSE CACHE BOOL "Setup for a multi-user installation, multi-user installations only sets up the modules and dependencies.")
 set(OPENCMISS_INDEPENDENT FALSE CACHE BOOL "Setup with independent locations for libraries, dependencies, and modules")
 set(OPENCMISS_VERSION "develop" CACHE STRING "The branch or tag to setup.")

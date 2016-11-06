@@ -1,8 +1,37 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+########################################################
+# Welcome to the OpenCMISS build system!
+########################################################
+# This script realises the top-level setup phase.
+# One of it's jobs is to make sure you have the minimum cmake version available (if not, you can have us build it for you).
+#
+# The easiest thing to do is nothing: CMake will determine from the current environment the system's setup and try to use that.
+# Otherwise, here's what you can configure at this stage:
+#
+# Configuration options
+# ########################################################
+# Specify any of the following variables on the command line via -DVARNAME=VALUE or set them in your CMake GUI.
+# The values in brackets indicate the default values, where [] denotes not set and | separates alternatives.
+#
+
+cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 
 project(OpenCMISS-Setup)
 
 include(ExternalProject)
+
+message(STATUS ":: ${CMAKE_MODULE_PATH}")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS ":: ${CMAKE_MODULE_PATH}")
+
+# This ensures that CMake is new enough before anything else is done
+# If its too old, the script will stop with an appropriate error message.
+# The option is to either come up with a sufficiently new version yourself,
+# or to build cmake using the (then generated) "cmake" target.
+include(OCCMakeCheck)
+# Need to make this outside the include as the return is intended for the main level
+if (NOT CMAKE_COMPATIBLE)
+    return()
+endif(NOT CMAKE_COMPATIBLE)
 
 # Clean up GUI options
 mark_as_advanced(QT_QMAKE_EXECUTABLE)
@@ -32,6 +61,8 @@ else ()
   unset(OPENCMISS_MODULES_ROOT CACHE)
   unset(OPENCMISS_MANAGE_ROOT CACHE)
 endif ()
+
+set(SETUP_PROJECTS MODULES MANAGE)
 
 if (OPENCMISS_MULTIUSER)
   unset(OPENCMISS_MULTICONFIG CACHE)
@@ -81,49 +112,58 @@ if (NOT VALID_CONFIG)
 	message(FATAL_ERROR "Invalid configuration.")
 endif ()
 
-set(MANAGE_CONFIGURE_CMD "${CMAKE_COMMAND}")
-
 # Everything should be valid from here onwards.
 if (DEFINED OPENCMISS_ROOT)
   set(OPENCMISS_LIBRARIES_ROOT "${OPENCMISS_ROOT}/src")
-  set(OPENCMISS_MANAGE_ROOT "${OPENCMISS_LIBRARIES_ROOT}/manage")
+  set(OPENCMISS_MANAGE_SOURCE_DIR "${OPENCMISS_ROOT}/src/manage")
   set(OPENCMISS_MANAGE_BINARY_DIR "${OPENCMISS_ROOT}/build/manage")
   set(OPENCMISS_DEPENDENCIES_ROOT "${OPENCMISS_ROOT}/src/dependencies")
   set(OPENCMISS_INSTALL_ROOT "${OPENCMISS_ROOT}/install")
   set(OPENCMISS_MODULES_ROOT "${OPENCMISS_INSTALL_ROOT}/cmake/opencmiss")
 else ()
-  set(OPENCMISS_MANAGE_BINARY_DIR "${OPENCMISS_MANAGE_ROOT}-build")
+  set(OPENCMISS_MANAGE_SOURCE_DIR "${OPENCMISS_MANAGE_ROOT}/src")
+  set(OPENCMISS_MANAGE_BINARY_DIR "${OPENCMISS_MANAGE_ROOT}/build")
 endif ()
 
-if (OPENCMISS_SINGLE_ARCHITECTURE)
-  list(APPEND MANAGE_CONFIGURE_CMD -DOC_USE_ARCHITECTURE_PATH=FALSE)
-endif ()
+set(MANAGE_CONFIGURE_CMD "")
+set(MANAGE_BUILD_CMD "")
+set(MANAGE_INSTALL_CMD "")
 
 if (OPENCMISS_PERFORM_INITIAL_BUILD)
+  set(MANAGE_CONFIGURE_CMD "${CMAKE_COMMAND}")
+
+  if (OPENCMISS_SINGLE_ARCHITECTURE)
+    list(APPEND MANAGE_CONFIGURE_CMD -DOC_USE_ARCHITECTURE_PATH=FALSE)
+  endif ()
+
+  if (DEFINED OPENCMISS_ROOT)
+  else ()
+    list(APPEND MANAGE_CONFIGURE_CMD -DOPENCMISS_LIBRARIES_ROOT=${OPENCMISS_LIBRARIES_ROOT})
+    list(APPEND MANAGE_CONFIGURE_CMD -DOPENCMISS_DEPENDENCIES_ROOT=${OPENCMISS_DEPENDENCIES_ROOT})
+  endif ()
   list(APPEND MANAGE_CONFIGURE_CMD "-DOPENCMISS_MODULE_PATH=${OPENCMISS_MODULES_ROOT}")
-  list(APPEND MANAGE_CONFIGURE_CMD "${OPENCMISS_MANAGE_ROOT}")
+  list(APPEND MANAGE_CONFIGURE_CMD "${OPENCMISS_MANAGE_SOURCE_DIR}")
   set(MANAGE_BUILD_CMD "")
-  set(MANAGE_INSTALL_CMD "")
 endif ()
 
-foreach (ROOT ${INDEPENDENT_ROOTS})
-  if (${ROOT} STREQUAL "MODULES")
+foreach (SETUP_PROJECT ${SETUP_PROJECTS})
+  if (${SETUP_PROJECT} STREQUAL "MODULES")
     set(REPOSITORY_NAME OpenCMISS-CMake-Modules)
     set(GITHUB_BRANCH ${OPENCMISS_VERSION})
-  elseif (${ROOT} STREQUAL "MANAGE")
+  elseif (${SETUP_PROJECT} STREQUAL "MANAGE")
     set(REPOSITORY_NAME OpenCMISS-Manage)
     set(GITHUB_BRANCH ${OPENCMISS_VERSION})
   else ()
-    set(REPOSITORY_NAME ${ROOT})
+    set(REPOSITORY_NAME ${SETUP_PROJECT})
   endif ()
   set(GITHUB_REPO ${GITHUB_PROTOCOL}${GITHUB_ORGANISATION}/${REPOSITORY_NAME}${GITHUB_EXT})
   if (GIT_FOUND)
-    set(DOWNLOAD_${ROOT}_CMD
+    set(DOWNLOAD_${SETUP_PROJECT}_CMD
       GIT_REPOSITORY ${GITHUB_REPO}
       GIT_TAG ${GITHUB_BRANCH}
     )
   else ()
-    set(DOWNLOAD_${ROOT}_CMD
+    set(DOWNLOAD_${SETUP_PROJECT}_CMD
       URL ${GITHUB_REPO}/archive/${GITHUB_BRANCH}.zip
     )
   endif ()
@@ -140,7 +180,7 @@ ExternalProject_Add(setup-modules
 ExternalProject_Add(setup-manage
   DEPENDS setup-modules
   ${DOWNLOAD_MANAGE_CMD}
-  SOURCE_DIR "${OPENCMISS_MANAGE_ROOT}"
+  SOURCE_DIR "${OPENCMISS_MANAGE_SOURCE_DIR}"
   BINARY_DIR "${OPENCMISS_MANAGE_BINARY_DIR}"
   CONFIGURE_COMMAND "${MANAGE_CONFIGURE_CMD}"
   BUILD_COMMAND "${MANAGE_BUILD_CMD}"

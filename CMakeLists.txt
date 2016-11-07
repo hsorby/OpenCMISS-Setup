@@ -43,8 +43,8 @@ endif ()
 set(OPENCMISS_MULTIUSER FALSE CACHE BOOL "Setup for a multi-user installation, multi-user installations only sets up the modules and dependencies.")
 set(OPENCMISS_INDEPENDENT FALSE CACHE BOOL "Setup with independent locations for libraries, dependencies, modules, and manage script.")
 set(OPENCMISS_VERSION "develop" CACHE STRING "The branch or tag to setup.")
-set(OPENCMISS_SINGLE_ARCHITECTURE TRUE CACHE BOOL "Setup for a single architecture build.")
 set(OPENCMISS_PERFORM_INITIAL_BUILD TRUE CACHE BOOL "Configure, build and install the default settings.")
+set(OPENCMISS_MULTI_ARCHITECTURE FALSE CACHE BOOL "Setup for a multi architecture build.")
 
 if (OPENCMISS_INDEPENDENT)
   set(OPENCMISS_LIBRARIES_ROOT "" CACHE PATH "The location for OpenCMISS libraires Iron and Zinc.")
@@ -63,11 +63,9 @@ endif ()
 set(SETUP_PROJECTS MODULES MANAGE)
 
 if (OPENCMISS_MULTIUSER)
-  unset(OPENCMISS_MULTICONFIG CACHE)
-  set(INDEPENDENT_ROOTS MODULES DEPENDENCIES)
+    set(OPENCMISS_MULTI_ARCHITECTURE TRUE CACHE BOOL "Setup for a multi architecture build.")
 else ()
-  set(INDEPENDENT_ROOTS LIBRARIES MODULES DEPENDENCIES MANAGE)
-  set(OPENCMISS_MULTICONFIG TRUE CACHE BOOL "Setup for a multi-config installation, setting to False sets up a fixed compiler and MPI installation.")
+    set(INDEPENDENT_ROOTS LIBRARIES MODULES DEPENDENCIES MANAGE)
 endif ()
 
 # Internalise some variables
@@ -130,7 +128,7 @@ set(MANAGE_INSTALL_CMD "")
 if (OPENCMISS_PERFORM_INITIAL_BUILD)
   set(MANAGE_CONFIGURE_CMD "${CMAKE_COMMAND}")
 
-  if (OPENCMISS_SINGLE_ARCHITECTURE)
+  if (NOT OPENCMISS_MULTI_ARCHITECTURE)
     list(APPEND MANAGE_CONFIGURE_CMD -DOC_USE_ARCHITECTURE_PATH=FALSE)
   endif ()
 

@@ -19,9 +19,7 @@ project(OpenCMISS-Setup)
 
 include(ExternalProject)
 
-message(STATUS ":: ${CMAKE_MODULE_PATH}")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
-message(STATUS ":: ${CMAKE_MODULE_PATH}")
 
 # This ensures that CMake is new enough before anything else is done
 # If its too old, the script will stop with an appropriate error message.
@@ -169,7 +167,7 @@ foreach (SETUP_PROJECT ${SETUP_PROJECTS})
   endif ()
 endforeach()
 
-ExternalProject_Add(setup-modules
+ExternalProject_Add(setup_modules
   ${DOWNLOAD_MODULES_CMD}
   SOURCE_DIR "${OPENCMISS_MODULES_ROOT}"
   CONFIGURE_COMMAND ""
@@ -177,8 +175,8 @@ ExternalProject_Add(setup-modules
   INSTALL_COMMAND ""
 )
 
-ExternalProject_Add(setup-manage
-  DEPENDS setup-modules
+ExternalProject_Add(setup_manage
+  DEPENDS setup_modules
   ${DOWNLOAD_MANAGE_CMD}
   SOURCE_DIR "${OPENCMISS_MANAGE_SOURCE_DIR}"
   BINARY_DIR "${OPENCMISS_MANAGE_BINARY_DIR}"

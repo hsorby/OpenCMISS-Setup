@@ -1,8 +1,9 @@
 # Need separate versioning as cmake 2.6 cannot handle "VERSION_LESS" yet
-SET(CMAKE_MIN_MAJOR_VERSION 4)
-SET(CMAKE_MIN_MINOR_VERSION 4)
-SET(CMAKE_MIN_PATCH_VERSION 0)
-SET(OPENCMISS_CMAKE_MIN_VERSION ${CMAKE_MIN_MAJOR_VERSION}.${CMAKE_MIN_MINOR_VERSION}.${CMAKE_MIN_PATCH_VERSION})
+SET(CMAKE_MIN_MAJOR_VERSION 3)
+SET(CMAKE_MIN_MINOR_VERSION 6)
+SET(CMAKE_MIN_PATCH_VERSION 3)
+set(OPENCMISS_CMAKE_VERSION_MAJ_MIN ${CMAKE_MIN_MAJOR_VERSION}.${CMAKE_MIN_MINOR_VERSION})
+SET(OPENCMISS_CMAKE_MIN_VERSION ${OPENCMISS_CMAKE_VERSION_MAJ_MIN}.${CMAKE_MIN_PATCH_VERSION})
 
 message(STATUS "Checking CMake version..")
 # Assume we're good until found otherwise
@@ -84,14 +85,16 @@ else(WIN32)
                 " In either case, you need to re-invoke this CMake setup phase using the new CMake binary.\n"
                 "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
         # Prepare "cmake" target that builds a new CMake version here
-        add_custom_target(cmake
-            COMMAND ${CMAKE_COMMAND}
-                -DCMAKE_MIN_MAJOR_VERSION=${CMAKE_MIN_MAJOR_VERSION}
-                -DCMAKE_MIN_MINOR_VERSION=${CMAKE_MIN_MINOR_VERSION}
-                -DCMAKE_MIN_PATCH_VERSION=${CMAKE_MIN_PATCH_VERSION}
-                -DOPENCMISS_CMAKE_MIN_VERSION=${OPENCMISS_CMAKE_MIN_VERSION}
-                -DCMAKE_MINIMUM_REQUIRED_VERSION=2.6
-                -P ${CMAKE_CURRENT_SOURCE_DIR}/ScriptCMakeBuild.cmake
-        )
+        include(OCCMakeBuild)
+#        add_custom_target(cmake
+#            COMMAND ${CMAKE_COMMAND}
+#                -DCMAKE_MIN_MAJOR_VERSION=${CMAKE_MIN_MAJOR_VERSION}
+#                -DCMAKE_MIN_MINOR_VERSION=${CMAKE_MIN_MINOR_VERSION}
+#                -DCMAKE_MIN_PATCH_VERSION=${CMAKE_MIN_PATCH_VERSION}
+#                -DOPENCMISS_CMAKE_MIN_VERSION=${OPENCMISS_CMAKE_MIN_VERSION}
+#                -DOPENCMISS_CMAKE_INSTALL_DIR=${CMAKE_MIN_INSTALL_DIR}
+#                -DCMAKE_MINIMUM_REQUIRED_VERSION=2.6
+#                -P ${CMAKE_CURRENT_SOURCE_DIR}/OCCMakeBuild.cmake
+#        )
     endif(NOT CMAKE_COMPATIBLE)
 endif(WIN32)

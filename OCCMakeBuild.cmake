@@ -1,7 +1,6 @@
 # This script is intended to be used within the OpenCMISS build environment, called from OCCMakeCheck.cmake.
 # Arguments passed to this script are:
 # CMAKE_MODULE_PATH
-# OPENCMISS_ROOT
 # CMAKE_MIN_MAJOR_VERSION
 # CMAKE_MIN_MINOR_VERSION
 # CMAKE_MIN_PATCH_VERSION
@@ -20,7 +19,11 @@ macro (printfinishmessage)
         "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 endmacro ()
      
-set(CMAKE_INSTALL_DIR ${OPENCMISS_ROOT}/install/utilities/cmake)
+if (EXISTS "${OPENCMISS_ROOT}")
+    set(CMAKE_INSTALL_DIR ${OPENCMISS_ROOT}/install/utilities/cmake)
+else ()
+    set(CMAKE_INSTALL_DIR ${OPENCMISS_DEPENDENCIES_ROOT}/install/cmake)
+endif ()
 set(MY_CMAKE_EXECUTABLE ${CMAKE_INSTALL_DIR}/bin/cmake${CMAKE_EXECUTABLE_SUFFIX})
 
 # Add check to see if the mayhaps already built version is the desired one
@@ -41,7 +44,6 @@ else ()
 
     # Otherwise .. need compilation!
     
-    set(CMAKE_SRC_DIR ${OPENCMISS_ROOT}/src/utilities)
     set(CMAKE_INTERMEDIATE_VERSION_MAJ_MIN 2.8)
     set(CMAKE_INTERMEDIATE_VERSION ${CMAKE_INTERMEDIATE_VERSION_MAJ_MIN}.4)
     
@@ -51,8 +53,11 @@ else ()
                         "A newer version is required to build version ${OPENCMISS_CMAKE_MIN_VERSION}. Building now..")
         # set up the paths for an intermediate version of cmake
         set(CMAKE_TARBALL cmake-${CMAKE_INTERMEDIATE_VERSION}.tar.gz)
-        set(CMAKE_INTERMEDIATE_VERSION_INSTALL_DIR ${OPENCMISS_ROOT}/install/utilities/cmake-${CMAKE_INTERMEDIATE_VERSION})
-        set(CMAKE_INSTALL_DIR ${CMAKE_INTERMEDIATE_VERSION_INSTALL_DIR})
+        if (EXISTS "${OPENCMISS_ROOT}")
+            set(CMAKE_INTERMEDIATE_VERSION_INSTALL_DIR ${OPENCMISS_ROOT}/install/utilities/cmake-${CMAKE_INTERMEDIATE_VERSION})
+        else ()
+            set(CMAKE_INTERMEDIATE_VERSION_INSTALL_DIR ${OPENCMISS_DEPENDENCIES_ROOT}/install/cmake-${CMAKE_INTERMEDIATE_VERSION})
+        endif ()
         set(_URL http://www.cmake.org/files/v${CMAKE_INTERMEDIATE_VERSION_MAJ_MIN}/${CMAKE_TARBALL})
         set(REQUIRED_CMAKE_SOURCE_DIR cmake_intermediate-v${CMAKE_INTERMEDIATE_VERSION})
         set(REQUIRED_CMAKE_BINARY_DIR cmake_intermediate-v${CMAKE_INTERMEDIATE_VERSION-build})
@@ -100,11 +105,13 @@ RedHat - openssl-devel")
     endif ()
     
     # reset the paths for latest cmake version
-    set(CMAKE_SRC_DIR ${OPENCMISS_ROOT}/src/utilities)
-    set(CMAKE_INSTALL_DIR ${OPENCMISS_ROOT}/install/utilities/cmake)
+    if (EXISTS "${OPENCMISS_ROOT}")
+        set(CMAKE_INSTALL_DIR ${OPENCMISS_ROOT}/install/utilities/cmake)
+    else ()
+        set(CMAKE_INSTALL_DIR ${OPENCMISS_DEPENDENCIES_ROOT}/install/cmake)
+    endif ()
     set(CMAKE_TARBALL cmake-${OPENCMISS_CMAKE_MIN_VERSION}.tar.gz)
     set(_URL http://www.cmake.org/files/v${OPENCMISS_CMAKE_VERSION_MAJ_MIN}/${CMAKE_TARBALL})
-    set(_TARBALL "${CMAKE_SRC_DIR}/${CMAKE_TARBALL}") 
 
     ExternalProject_Add(cmake_required
         ${INTERMEDIATE_DEPENDS}

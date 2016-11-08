@@ -46,7 +46,7 @@ endif ()
 
 set(OPENCMISS_MULTI_USER FALSE CACHE BOOL "Setup for a multi-user installation, multi-user installations only sets up the modules and dependencies.")
 set(OPENCMISS_INDEPENDENT FALSE CACHE BOOL "Setup with independent locations for libraries, dependencies, modules, and manage script.")
-set(OPENCMISS_VERSION "develop" CACHE STRING "The branch or tag to setup.")
+set(OPENCMISS_VERSION "develop" CACHE STRING "The branch or tag to setup.  Must be one of: ${KNOWN_OPENCMISS_VERSIONS}")
 set(OPENCMISS_PERFORM_INITIAL_BUILD TRUE CACHE BOOL "Configure, build and install the default settings.")
 set(OPENCMISS_MULTI_ARCHITECTURE FALSE CACHE BOOL "Setup for a multi architecture build.")
 

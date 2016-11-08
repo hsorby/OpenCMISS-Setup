@@ -22,7 +22,8 @@ if (NOT ${_HTTPS_CHECK_VAR})
     list(GET https_status 1 HTTPS_TEST_DOWNLOAD_ERROR_STRING)
     # https download was successful
     if (HTTPS_TEST_DOWNLOAD_ERROR_CODE EQUAL 0)
-        set(${_HTTPS_CHECK_VAR} YES CACHE BOOL "Checks if CMake ${CMAKE_VERSION} is build with SSL support")
+        set(${_HTTPS_CHECK_VAR} YES CACHE BOOL "Checks if CMake ${CMAKE_VERSION} is built with SSL support")
+        mark_as_advanced(${_HTTPS_CHECK_VAR})
     endif(HTTPS_TEST_DOWNLOAD_ERROR_CODE EQUAL 0)
     # remove the test file as it will be created either way
     file(REMOVE ${CMAKE_HTTPS_TEST_DOWNLOAD_PATH})

@@ -35,6 +35,8 @@ if (NOT CMAKE_COMPATIBLE)
     return()
 endif(NOT CMAKE_COMPATIBLE)
 
+include(OCFunctions)
+
 # Clean up GUI options
 mark_as_advanced(QT_QMAKE_EXECUTABLE)
 if (APPLE)
@@ -76,7 +78,17 @@ find_package(Git)
 
 set(GITHUB_ORGANISATION hsorby) # Should be 'OpenCMISS'
 if (GIT_FOUND)
-    set(GITHUB_PROTOCOL "git@github.com:")
+    if ( (NOT HAVE_SSH_GITHUB_ACCESS AND NOT SSH_GITHUB_ACCESS_CHECKED) OR FORCE_GITHUB_SSH_CHECK)
+        check_ssh_github_access(HAVE_SSH_GITHUB_ACCESS)
+        set(SSH_GITHUB_ACCESS_CHECKED TRUE CACHE BOOL "ssh access to github.com checked.")
+        mark_as_advanced(SSH_GITHUB_ACCESS_CHECKED)
+        message(STATUS "Have ssh access to GitHub.com: ${HAVE_SSH_GITHUB_ACCESS}")
+    endif ()
+    if (HAVE_SSH_GITHUB_ACCESS)
+        set(GITHUB_PROTOCOL "git@github.com:")
+    else ()
+        set(GITHUB_PROTOCOL "https://github.com/")
+    endif ()
     set(GITHUB_EXT ".git")
 else ()
     set(GITHUB_PROTOCOL "https://github.com/")

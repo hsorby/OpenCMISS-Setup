@@ -21,6 +21,12 @@ cmake_policy(SET CMP0057 NEW)
 include(ExternalProject)
 
 set(SETUP_PROJECTS CMAKE_MODULES MANAGE)
+
+set(MANAGE_REPO hsorby/OpenCMISS-Manage) # Should be 'OpenCMISS/something'
+set(CMAKE_MODULES_REPO hsorby/OpenCMISS-CMake-Modules)
+set(MANAGE_BRANCH develop)
+set(CMAKE_MODULES_BRANCH develop)
+
 set(KNOWN_OPENCMISS_VERSIONS develop)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -46,11 +52,8 @@ if (APPLE)
     mark_as_advanced(CMAKE_OSX_SYSROOT)
 endif ()
 
-set(OPENCMISS_MULTI_USER FALSE CACHE BOOL "Setup for a multi-user installation, multi-user installations only sets up the modules and dependencies.")
 set(OPENCMISS_INDEPENDENT FALSE CACHE BOOL "Setup with independent locations for libraries, dependencies, modules, and manage script.")
-set(OPENCMISS_VERSION "develop" CACHE STRING "The branch or tag to setup.  Must be one of: ${KNOWN_OPENCMISS_VERSIONS}")
 set(OPENCMISS_PERFORM_INITIAL_BUILD TRUE CACHE BOOL "Configure, build and install the default settings.")
-set(OPENCMISS_MULTI_ARCHITECTURE FALSE CACHE BOOL "Setup for a multi architecture build.")
 
 if (OPENCMISS_INDEPENDENT)
     set(OPENCMISS_LIBRARIES_ROOT "" CACHE PATH "The location for OpenCMISS libraires Iron and Zinc.")
@@ -59,11 +62,21 @@ if (OPENCMISS_INDEPENDENT)
     set(OPENCMISS_CMAKE_MODULES_ROOT "" CACHE PATH "The location for the OpenCMISS CMake modules.")
     unset(OPENCMISS_ROOT CACHE)
 else ()
-    set(OPENCMISS_ROOT ${OPENCMISS_ROOT} CACHE PATH "Root directory for OpenCMISS.")
+    set(OPENCMISS_ROOT "${OPENCMISS_ROOT}" CACHE PATH "Root directory for OpenCMISS.")
     unset(OPENCMISS_LIBRARIES_ROOT CACHE)
     unset(OPENCMISS_DEPENDENCIES_ROOT CACHE)
     unset(OPENCMISS_CMAKE_MODULES_ROOT CACHE)
     unset(OPENCMISS_MANAGE_ROOT CACHE)
+endif ()
+
+if (OPENCMISS_PERFORM_INITIAL_BUILD)
+    set(OPENCMISS_MULTI_USER FALSE CACHE BOOL "Setup for a multi-user installation, multi-user installations only sets up the modules and dependencies.")
+    set(OPENCMISS_VERSION "develop" CACHE STRING "The branch or tag to setup.  Must be one of: ${KNOWN_OPENCMISS_VERSIONS}")
+    set(OPENCMISS_MULTI_ARCHITECTURE FALSE CACHE BOOL "Setup for a multi architecture build.")
+else ()
+    unset(OPENCMISS_MULTI_USER CACHE)
+    unset(OPENCMISS_VERSION CACHE)
+    unset(OPENCMISS_MULTI_ARCHITECTURE CACHE)
 endif ()
 
 if (NOT OPENCMISS_MULTI_USER)
@@ -76,7 +89,6 @@ set(CMAKE_INSTALL_PREFIX "" CACHE INTERNAL "Internalise CMAKE_INSTALL_PREFIX")
 
 find_package(Git)
 
-set(GITHUB_ORGANISATION hsorby) # Should be 'OpenCMISS'
 if (GIT_FOUND)
     if ( (NOT HAVE_SSH_GITHUB_ACCESS AND NOT SSH_GITHUB_ACCESS_CHECKED) OR FORCE_GITHUB_SSH_CHECK)
         check_ssh_github_access(HAVE_SSH_GITHUB_ACCESS)
@@ -97,7 +109,7 @@ endif ()
 # Make all paths CMake paths:
 foreach(_path_var OPENCMISS_ROOT OPENCMISS_LIBRARIES_ROOT OPENCMISS_DEPENDENCIES_ROOT OPENCMISS_MANAGE_ROOT OPENCMISS_CMAKE_MODULES_ROOT)
     if (DEFINED ${_path_var})
-        file(TO_CMAKE_PATH ${${_path_var}} ${_path_var})
+        file(TO_CMAKE_PATH "${${_path_var}}" ${_path_var})
     endif ()
 endforeach()
 
@@ -145,9 +157,19 @@ else ()
     set(OPENCMISS_CMAKE_MODULE_PATH "${OPENCMISS_CMAKE_MODULES_ROOT}/install/share/cmake")
 endif ()
 
-set(MANAGE_CONFIGURE_CMD "")
 set(MANAGE_BUILD_CMD "")
 set(MANAGE_INSTALL_CMD "")
+
+# Basic test for multi-configuration capable environments
+if (MSVC OR XCODE_VERSION)
+    mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_CONFIG --config Release)
+    if (OPENCMISS_PERFORM_INITIAL_BUILD)
+        list(APPEND MANAGE_BUILD_CMD --config Release)
+    endif ()
+else ()
+    set(CMAKE_CONFIG_BUILD_TYPE -DCMAKE_BUILD_TYPE=Release)
+endif ()
 
 if (OPENCMISS_PERFORM_INITIAL_BUILD)
     if (NOT OPENCMISS_MULTI_ARCHITECTURE)
@@ -171,20 +193,23 @@ if (OPENCMISS_PERFORM_INITIAL_BUILD)
         list(APPEND CMAKE_MODULES_ARGS -DOPENCMISS_CMAKE_MODULE_PATH=${OPENCMISS_CMAKE_MODULES_PATH})
     endif ()
     set(MANAGE_BUILD_CMD ${CMAKE_COMMAND} --build . --target do_config)
-    # set(MANAGE_BUILD_CMD "") # Remove me soon
+    set(MANAGE_CONFIGURE_SWITCHABLE_COMMAND
+        CMAKE_COMMAND ${CMAKE_COMMAND}
+        CMAKE_GENERATOR ${CMAKE_GENERATOR}
+        CMAKE_ARGS ${CMAKE_CONFIG_BUILD_TYPE} ${MANAGE_CONFIGURE_ARGS}
+        )
+else ()
+    # Turn configure stage of manage off
+    set(MANAGE_CONFIGURE_SWITCHABLE_COMMAND CONFIGURE_COMMAND ${CMAKE_COMMAND} -E echo "Skipping configure step for 'setup_manage'")
 endif ()
 
 foreach (SETUP_PROJECT ${SETUP_PROJECTS})
-    if (${SETUP_PROJECT} STREQUAL "CMAKE_MODULES")
-        set(REPOSITORY_NAME OpenCMISS-CMake-Modules)
+    set(GITHUB_BRANCH ${${SETUP_PROJECT}_BRANCH})
+    set(GITHUB_REPO ${${SETUP_PROJECT}_REPO})
+    if ("${OPENCMISS_VERSION}" STREQUAL "develop")
         set(GITHUB_BRANCH ${OPENCMISS_VERSION})
-    elseif (${SETUP_PROJECT} STREQUAL "MANAGE")
-        set(REPOSITORY_NAME OpenCMISS-Manage)
-        set(GITHUB_BRANCH ${OPENCMISS_VERSION})
-    else ()
-        message(FATAL_ERROR "Unknown setup projecg specified!")
     endif ()
-    set(GITHUB_REPO ${GITHUB_PROTOCOL}${GITHUB_ORGANISATION}/${REPOSITORY_NAME}${GITHUB_EXT})
+    set(GITHUB_REPO ${GITHUB_PROTOCOL}${GITHUB_REPO}${GITHUB_EXT})
     if (GIT_FOUND)
         set(DOWNLOAD_${SETUP_PROJECT}_CMD
             GIT_REPOSITORY ${GITHUB_REPO}
@@ -197,16 +222,6 @@ foreach (SETUP_PROJECT ${SETUP_PROJECTS})
     endif ()
 endforeach ()
 
-# Basic test for multi-configuration capable environments
-if (MSVC OR XCODE_VERSION)
-    set(CMAKE_BUILD_CONFIG --config Release)
-    if (MANAGE_BUILD_CMD)
-        list(APPEND MANAGE_BUILD_CMD --config Release)
-    endif ()
-else ()
-    set(CMAKE_CONFIG_BUILD_TYPE -DCMAKE_BUILD_TYPE=Release)
-endif ()
-
 ExternalProject_Add(setup_modules
     ${DOWNLOAD_CMAKE_MODULES_CMD}
     SOURCE_DIR "${OPENCMISS_CMAKE_MODULES_SOURCE_DIR}"
@@ -215,7 +230,7 @@ ExternalProject_Add(setup_modules
     CMAKE_GENERATOR ${CMAKE_GENERATOR}
     CMAKE_ARGS ${CMAKE_CONFIG_BUILD_TYPE} ${CMAKE_MODULES_ARGS}
     BUILD_COMMAND ""
-    INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install ${CMAKE_BILD_CONFIG}
+    INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install ${CMAKE_BUILD_CONFIG}
     )
 
 ExternalProject_Add(setup_manage
@@ -223,9 +238,7 @@ ExternalProject_Add(setup_manage
     ${DOWNLOAD_MANAGE_CMD}
     SOURCE_DIR "${OPENCMISS_MANAGE_SOURCE_DIR}"
     BINARY_DIR "${OPENCMISS_MANAGE_BINARY_DIR}"
-    CMAKE_COMMAND ${CMAKE_COMMAND}
-    CMAKE_GENERATOR ${CMAKE_GENERATOR}
-    CMAKE_ARGS ${CMAKE_CONFIG_BUILD_TYPE} ${MANAGE_CONFIGURE_ARGS}
+    ${MANAGE_CONFIGURE_SWITCHABLE_COMMAND}
     BUILD_COMMAND "${MANAGE_BUILD_CMD}"
     INSTALL_COMMAND "${MANAGE_INSTALL_CMD}"
     )
@@ -233,14 +246,15 @@ ExternalProject_Add(setup_manage
 set(PRINT_SUMMARY TRUE)
 if (PRINT_SUMMARY)
     message(STATUS "@")
-    message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@
+    message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@ SUMMARY @@@@@@@@@@@@@@@@@@@@@@@@")
     message(STATUS "@")
-    message(STATUS "@ OPENCMISS_MULTI_USER: ${OPENCMISS_MULTI_USER}")
     message(STATUS "@ OPENCMISS_INDEPENDENT: ${OPENCMISS_INDEPENDENT}")
-    message(STATUS "@ OPENCMISS_VERSION: ${OPENCMISS_VERSION}")
     message(STATUS "@ OPENCMISS_PERFORM_INITIAL_BUILD: ${OPENCMISS_PERFORM_INITIAL_BUILD}")
-    message(STATUS "@ OPENCMISS_MULTI_ARCHITECTURE: ${OPENCMISS_MULTI_ARCHITECTURE}")
-    message(STATUS "@ OPENCMISS_MULTI_USER: ${OPENCMISS_MULTI_USER}")
+    if (OPENCMISS_PERFORM_INITIAL_BUILD)
+        message(STATUS "@ OPENCMISS_VERSION: ${OPENCMISS_VERSION}")
+        message(STATUS "@ OPENCMISS_MULTI_ARCHITECTURE: ${OPENCMISS_MULTI_ARCHITECTURE}")
+        message(STATUS "@ OPENCMISS_MULTI_USER: ${OPENCMISS_MULTI_USER}")
+    endif ()
     message(STATUS "@")
     if (DEFINED OPENCMISS_ROOT)
         message(STATUS "@ OPENCMISS_ROOT: ${OPENCMISS_ROOT}")
@@ -254,8 +268,10 @@ if (PRINT_SUMMARY)
     message(STATUS "@ OPENCMISS_CMAKE_MODULES_BINARY_DIR: ${OPENCMISS_CMAKE_MODULES_BINARY_DIR}")
     message(STATUS "@ OPENCMISS_CMAKE_MODULE_PATH: ${OPENCMISS_CMAKE_MODULE_PATH}")
     message(STATUS "@")
-    message(STATUS "@ MANAGE_CONFIGURE_ARGS: ${MANAGE_CONFIGURE_ARGS}")
-    message(STATUS "@")
+    if (OPENCMISS_PERFORM_INITIAL_BUILD)
+        message(STATUS "@ MANAGE_CONFIGURE_ARGS: ${MANAGE_CONFIGURE_ARGS}")
+        message(STATUS "@")
+    endif ()
     message(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     message(STATUS "@")
 endif ()

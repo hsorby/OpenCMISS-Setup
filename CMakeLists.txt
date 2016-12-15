@@ -145,7 +145,7 @@ endif ()
 if (MSVC OR XCODE)
     set(MULTICONFIG_BUILD_CONFIG --config Release)
 else ()
-    set(SINGLE_ARCHITECUTRE_BUILD_TYPE /Release)
+    set(SINGLE_ARCHITECUTRE_BUILD_TYPE /release)
     set(SINGLE_BUILD_CONFIG -DCMAKE_BUILD_TYPE=Release)
 endif ()
 

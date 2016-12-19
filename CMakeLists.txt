@@ -22,8 +22,8 @@ include(ExternalProject)
 
 set(SETUP_PROJECTS CMAKE_MODULES MANAGE)
 
-set(MANAGE_REPO hsorby/OpenCMISS-Manage) # Should be 'OpenCMISS/something'
-set(CMAKE_MODULES_REPO hsorby/OpenCMISS-CMake-Modules)
+set(MANAGE_REPO OpenCMISS/manage)
+set(CMAKE_MODULES_REPO OpenCMISS/cmake_modules)
 set(MANAGE_BRANCH develop)
 set(CMAKE_MODULES_BRANCH develop)
 

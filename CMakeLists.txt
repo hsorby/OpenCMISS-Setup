@@ -105,6 +105,7 @@ if (GIT_FOUND)
 else ()
     set(GITHUB_PROTOCOL "https://github.com/")
 endif ()
+message(STATUS "Using GitHub protocol: ${GITHUB_PROTOCOL}")
 
 # Make all paths CMake paths:
 foreach(_path_var OPENCMISS_ROOT OPENCMISS_LIBRARIES_ROOT OPENCMISS_DEPENDENCIES_ROOT OPENCMISS_MANAGE_ROOT OPENCMISS_CMAKE_MODULES_ROOT)

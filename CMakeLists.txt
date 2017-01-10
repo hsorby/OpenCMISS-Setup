@@ -22,8 +22,10 @@ include(ExternalProject)
 
 set(SETUP_PROJECTS CMAKE_MODULES MANAGE)
 
-set(MANAGE_REPO OpenCMISS/manage)
-set(CMAKE_MODULES_REPO OpenCMISS/cmake_modules)
+set(MANAGE_ORG OpenCMISS)
+set(CMAKE_MODULES_ORG OpenCMISS)
+set(MANAGE_REPO ${MANAGE_ORG}/manage)
+set(CMAKE_MODULES_REPO ${CMAKE_MODULES_ORG}/cmake_modules)
 set(MANAGE_BRANCH develop)
 set(CMAKE_MODULES_BRANCH develop)
 
@@ -142,7 +144,9 @@ if (NOT VALID_CONFIG)
     message(FATAL_ERROR "Invalid configuration.")
 endif ()
 
+# Basic test for multi-configuration capable environments
 if (MSVC OR XCODE)
+    mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
     set(MULTICONFIG_BUILD_CONFIG --config Release)
 else ()
     set(SINGLE_ARCHITECUTRE_BUILD_TYPE /release)
@@ -166,17 +170,6 @@ endif ()
 
 set(MANAGE_BUILD_CMD "")
 set(MANAGE_INSTALL_CMD "")
-
-# Basic test for multi-configuration capable environments
-if (MSVC OR XCODE_VERSION)
-    mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
-    set(CMAKE_BUILD_CONFIG --config Release)
-    if (OPENCMISS_PERFORM_INITIAL_BUILD)
-        list(APPEND MANAGE_BUILD_CMD --config Release)
-    endif ()
-else ()
-    set(CMAKE_CONFIG_BUILD_TYPE -DCMAKE_BUILD_TYPE=Release)
-endif ()
 
 if (OPENCMISS_PERFORM_INITIAL_BUILD)
     if (NOT OPENCMISS_MULTI_ARCHITECTURE)

@@ -104,6 +104,7 @@ endforeach()
 # Internalise some variables that don't have any meaning here
 set(CMAKE_BUILD_TYPE "" CACHE INTERNAL "Internalise CMAKE_BUILD_TYPE")
 set(CMAKE_INSTALL_PREFIX "" CACHE INTERNAL "Internalise CMAKE_INSTALL_PREFIX")
+set(CMAKE_CONFIGURATION_TYPES "" CACHE INTERNAL "Internalise CMAKE_CONFIGURATION_TYPES")
 
 find_package(Git)
 

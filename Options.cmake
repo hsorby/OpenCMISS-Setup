@@ -72,9 +72,9 @@ set(OPENCMISS_MULTI_ARCHITECTURE FALSE CACHE BOOL "Setup for a multi architectur
 # Set the OpenCMISS libraries to build.  The value of this variable must be one of
 # the known OpenCMISS libraries build types [|all|, iron, zinc].
 #
-# The default value is 'all_libraries'.
+# The default value is 'all'.
 
-set(OPENCMISS_LIBRARIES "" CACHE PATH "Set which OpenCMISS libraries to build.")
+set(OPENCMISS_LIBRARIES "all" CACHE PATH "Set which OpenCMISS libraries to build.")
 
 ##
 # .. _`opencmiss_root`:

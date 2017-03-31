@@ -74,7 +74,7 @@ set(OPENCMISS_MULTI_ARCHITECTURE FALSE CACHE BOOL "Setup for a multi architectur
 #
 # The default value is 'all'.
 
-set(OPENCMISS_LIBRARIES "all" CACHE PATH "Set which OpenCMISS libraries to build.")
+set(OPENCMISS_LIBRARIES "all" CACHE STRING "Set which OpenCMISS libraries to build.")
 
 ##
 # .. _`opencmiss_root`:

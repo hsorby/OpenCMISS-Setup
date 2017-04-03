@@ -181,7 +181,7 @@ endif ()
 # Basic test for multi-configuration capable environments
 if (_MULTI_CONFIG_ENV)
     mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
-    set(MULTICONFIG_BUILD_CONFIG --config <CONFIG>)
+    set(MULTICONFIG_BUILD_CONFIG --config $<CONFIGURATION>)
 else ()
     set(SINGLE_ARCHITECUTRE_BUILD_TYPE /release)
     set(SINGLE_BUILD_CONFIG -DCMAKE_BUILD_TYPE=Release)

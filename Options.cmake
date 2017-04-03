@@ -45,9 +45,10 @@ set(OPENCMISS_INDEPENDENT FALSE CACHE BOOL "Setup with independent locations for
 # OPENCMISS_PERFORM_INITIAL_BUILD
 # -------------------------------
 #
-# A boolean valued variable to set whether the installation should be setup with independent roots or not.  If the 
-# value is false a single root variable :cmake:`OPENCMISS_ROOT` is used under which the entire installation of OpenCMISS libraries
-# will be placed.
+# A boolean valued variable to set whether the initial configuration should be built once the setup of the OpenCMISS CMake modules 
+# and manage projects has been finished.
+#
+# See also: :cmake:`OPENCMISS_MULTI_ARCHITECTURE`, :cmake:`OPENCMISS_CONFIG_BUILD_TYPE`
 
 set(OPENCMISS_PERFORM_INITIAL_BUILD TRUE CACHE BOOL "Configure, build and install the default settings.")
 
@@ -57,11 +58,30 @@ set(OPENCMISS_PERFORM_INITIAL_BUILD TRUE CACHE BOOL "Configure, build and instal
 # OPENCMISS_MULTI_ARCHITECTURE
 # ----------------------------
 #
-# A boolean valued variable to set whether the installation should be setup with independent roots or not.  If the 
-# value is false a single root variable :cmake:`OPENCMISS_ROOT` is used under which the entire installation of OpenCMISS libraries
-# will be placed.
+# A boolean valued variable to set whether the installation should be setup for multiple architectures (multiple compiler toolchains, MPI).
+# If the value is false a only a single architecture will be possible once a configuration has been created.  If the value is true the path to 
+# the configuration, build, and install trees will have the path prepended with the details of the architecture (computer architectre/compilers in use/MPI in use).
+#
+# This option is available only if :cmake:`OPENCMISS_PERFORM_INITIAL_BUILD` is on.
+#
+# See also: :cmake:`OPENCMISS_PERFORM_INITIAL_BUILD`
 
 set(OPENCMISS_MULTI_ARCHITECTURE FALSE CACHE BOOL "Setup for a multi architecture build.")
+
+##
+# .. _`opencmiss_config_build_type`:
+#
+# OPENCMISS_CONFIG_BUILD_TYPE
+# ---------------------------
+#
+# Set the configuration build type to build.  In multiple configuration environments (like Microsoft Visual Studio) the configuration build type is 
+# taken from the active build configuration.
+#
+# This option is available in single configuration environments and only if :cmake:`OPENCMISS_PERFORM_INITIAL_BUILD` is on.
+#
+# See also: :cmake:`OPENCMISS_PERFORM_INITIAL_BUILD`
+
+set(OPENCMISS_CONFIG_BUILD_TYPE Release CACHE STRING "Set the configuration build type.")
 
 ##
 # .. _`opencmiss_libraries`:

@@ -56,6 +56,13 @@ endif(NOT CMAKE_COMPATIBLE)
 
 include(OCFunctions)
 
+# Basic test for multi-configuration capable environments
+if (MSVC OR XCODE)
+    set(_MULTI_CONFIG_ENV TRUE)
+else ()
+    set(_MULTI_CONFIG_ENV FALSE)
+endif ()
+
 # Clean up GUI options
 mark_as_advanced(QT_QMAKE_EXECUTABLE)
 if (APPLE)
@@ -88,9 +95,14 @@ endif ()
 if (OPENCMISS_PERFORM_INITIAL_BUILD)
     set(OPENCMISS_VERSION "develop" CACHE STRING "The branch or tag to setup.  Must be one of: ${KNOWN_OPENCMISS_VERSIONS}")
     set(OPENCMISS_MULTI_ARCHITECTURE FALSE CACHE BOOL "Setup for a multi architecture build.")
+    if (NOT _MULTI_CONFIG_ENV)
+        set(OPENCMISS_CONFIG_BUILD_TYPE Release CACHE STRING "Set the configuration build type.")
+        set_property(CACHE OPENCMISS_CONFIG_BUILD_TYPE PROPERTY STRINGS Release RelWithDebInfo Debug MinSizeRel)
+    endif ()
 else ()
     unset(OPENCMISS_VERSION CACHE)
     unset(OPENCMISS_MULTI_ARCHITECTURE CACHE)
+    unset(OPENCMISS_CONFIG_BUILD_TYPE CACHE)
 endif ()
 
 if (OPENCMISS_INDEPENDENT)
@@ -116,7 +128,7 @@ endif ()
 # Internalise some variables that don't have any meaning here
 set(CMAKE_BUILD_TYPE "Release" CACHE INTERNAL "Internalise CMAKE_BUILD_TYPE")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE INTERNAL "Internalise CMAKE_INSTALL_PREFIX")
-set(CMAKE_CONFIGURATION_TYPES "Release" CACHE INTERNAL "Internalise CMAKE_CONFIGURATION_TYPES")
+set(CMAKE_CONFIGURATION_TYPES ${CMAKE_CONFIGURATION_TYPES} CACHE INTERNAL "Internalise CMAKE_CONFIGURATION_TYPES")
 
 find_package(Git)
 
@@ -167,9 +179,9 @@ if (NOT VALID_CONFIG)
 endif ()
 
 # Basic test for multi-configuration capable environments
-if (MSVC OR XCODE)
+if (_MULTI_CONFIG_ENV)
     mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
-    set(MULTICONFIG_BUILD_CONFIG --config Release)
+    set(MULTICONFIG_BUILD_CONFIG --config <CONFIG>)
 else ()
     set(SINGLE_ARCHITECUTRE_BUILD_TYPE /release)
     set(SINGLE_BUILD_CONFIG -DCMAKE_BUILD_TYPE=Release)
@@ -210,14 +222,16 @@ if (OPENCMISS_PERFORM_INITIAL_BUILD)
     if ("${OPENCMISS_VERSION}" STREQUAL "develop")
         list(APPEND MANAGE_CONFIGURE_ARGS -DOPENCMISS_DEVEL_ALL=YES)
     endif ()
-	
-	if ("${OPENCMISS_LIBRARIES}" STREQUAL "iron")
-		list(APPEND MANAGE_CONFIGURE_ARGS -DOPENCMISS_IRON_ONLY=TRUE)
-	endif ()
 
-	if ("${OPENCMISS_LIBRARIES}" STREQUAL "zinc")
-		list(APPEND MANAGE_CONFIGURE_ARGS -DOPENCMISS_ZINC_ONLY=TRUE)
-	endif ()
+    list(APPEND MANAGE_CONFIGURE_ARGS -DOPENCMISS_BUILD_TYPE=${OPENCMISS_CONFIG_BUILD_TYPE})
+
+    if ("${OPENCMISS_LIBRARIES}" STREQUAL "iron")
+        list(APPEND MANAGE_CONFIGURE_ARGS -DOPENCMISS_IRON_ONLY=TRUE)
+    endif ()
+
+    if ("${OPENCMISS_LIBRARIES}" STREQUAL "zinc")
+        list(APPEND MANAGE_CONFIGURE_ARGS -DOPENCMISS_ZINC_ONLY=TRUE)
+    endif ()
 
     foreach(_E ${${_VISIBLE_LIST}})
         if (NOT "${_E}" STREQUAL "OPENCMISS_ROOT" AND NOT "${_E}" STREQUAL "OPENCMISS_MANAGE_ROOT" AND NOT "${_E}" STREQUAL "OPENCMISS_LIBRARIES")

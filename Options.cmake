@@ -45,9 +45,10 @@ set(OPENCMISS_INDEPENDENT FALSE CACHE BOOL "Setup with independent locations for
 # OPENCMISS_PERFORM_INITIAL_BUILD
 # -------------------------------
 #
-# A boolean valued variable to set whether the installation should be setup with independent roots or not.  If the 
-# value is false a single root variable :cmake:`OPENCMISS_ROOT` is used under which the entire installation of OpenCMISS libraries
-# will be placed.
+# A boolean valued variable to set whether the initial configuration should be built once the setup of the OpenCMISS CMake modules 
+# and manage projects has been finished.
+#
+# See also: :cmake:`OPENCMISS_MULTI_ARCHITECTURE`, :cmake:`OPENCMISS_CONFIG_BUILD_TYPE`
 
 set(OPENCMISS_PERFORM_INITIAL_BUILD TRUE CACHE BOOL "Configure, build and install the default settings.")
 
@@ -57,11 +58,43 @@ set(OPENCMISS_PERFORM_INITIAL_BUILD TRUE CACHE BOOL "Configure, build and instal
 # OPENCMISS_MULTI_ARCHITECTURE
 # ----------------------------
 #
-# A boolean valued variable to set whether the installation should be setup with independent roots or not.  If the 
-# value is false a single root variable :cmake:`OPENCMISS_ROOT` is used under which the entire installation of OpenCMISS libraries
-# will be placed.
+# A boolean valued variable to set whether the installation should be setup for multiple architectures (multiple compiler toolchains, MPI).
+# If the value is false a only a single architecture will be possible once a configuration has been created.  If the value is true the path to 
+# the configuration, build, and install trees will have the path prepended with the details of the architecture (computer architectre/compilers in use/MPI in use).
+#
+# This option is available only if :cmake:`OPENCMISS_PERFORM_INITIAL_BUILD` is on.
+#
+# See also: :cmake:`OPENCMISS_PERFORM_INITIAL_BUILD`
 
 set(OPENCMISS_MULTI_ARCHITECTURE FALSE CACHE BOOL "Setup for a multi architecture build.")
+
+##
+# .. _`opencmiss_config_build_type`:
+#
+# OPENCMISS_CONFIG_BUILD_TYPE
+# ---------------------------
+#
+# Set the configuration build type to build.  In multiple configuration environments (like Microsoft Visual Studio) the configuration build type is 
+# taken from the active build configuration.
+#
+# This option is available in single configuration environments and only if :cmake:`OPENCMISS_PERFORM_INITIAL_BUILD` is on.
+#
+# See also: :cmake:`OPENCMISS_PERFORM_INITIAL_BUILD`
+
+set(OPENCMISS_CONFIG_BUILD_TYPE Release CACHE STRING "Set the configuration build type.")
+
+##
+# .. _`opencmiss_libraries`:
+#
+# OPENCMISS_LIBRARIES
+# -------------------
+#
+# Set the OpenCMISS libraries to build.  The value of this variable must be one of
+# the known OpenCMISS libraries build types [|all|, iron, zinc].
+#
+# The default value is 'all'.
+
+set(OPENCMISS_LIBRARIES "all" CACHE STRING "Set which OpenCMISS libraries to build.")
 
 ##
 # .. _`opencmiss_root`:
@@ -72,7 +105,6 @@ set(OPENCMISS_MULTI_ARCHITECTURE FALSE CACHE BOOL "Setup for a multi architectur
 # The location of the installation for the whole OpenCMISS libraries installation.
 #
 # Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
-#
 
 set(OPENCMISS_ROOT "" CACHE PATH "The location of the OpenCMISS root root")
 
@@ -85,7 +117,6 @@ set(OPENCMISS_ROOT "" CACHE PATH "The location of the OpenCMISS root root")
 # The location of the installation for the OpenCMISS libraries.
 #
 # Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
-#
 
 set(OPENCMISS_LIBRARIES_ROOT "" CACHE PATH "The location of the OpenCMISS root libraries")
 
@@ -99,7 +130,6 @@ set(OPENCMISS_LIBRARIES_ROOT "" CACHE PATH "The location of the OpenCMISS root l
 # :cmake:`OPENCMISS_INDEPENDENT` is :cmake:`FALSE`.
 #
 # Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
-#
 
 set(OPENCMISS_DEPENDENCIES_ROOT "" CACHE PATH "The location of the OpenCMISS root dependencies")
 
@@ -112,7 +142,6 @@ set(OPENCMISS_DEPENDENCIES_ROOT "" CACHE PATH "The location of the OpenCMISS roo
 # The location of the installation for the OpenCMISS manage installation.
 #
 # Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
-#
 
 set(OPENCMISS_MANAGE_ROOT "" CACHE PATH "The location of the OpenCMISS root manage")
 
@@ -125,7 +154,6 @@ set(OPENCMISS_MANAGE_ROOT "" CACHE PATH "The location of the OpenCMISS root mana
 # The location of the installation for the OpenCMISS CMake modules installation.
 #
 # Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
-#
 
 set(OPENCMISS_CMAKE_MODULES_ROOT "" CACHE PATH "The location of the OpenCMISS root CMake modules")
 
@@ -137,8 +165,7 @@ set(OPENCMISS_CMAKE_MODULES_ROOT "" CACHE PATH "The location of the OpenCMISS ro
 #
 # The location of the installation for the OpenCMISS Iron installation.
 #
-# Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
-#
+# Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT`, :cmake:`OPENCMISS_LIBRARIES` and :cmake:`OPENCMISS_SETUP_TYPE`
 
 set(OPENCMISS_IRON_ROOT "" CACHE PATH "The location of the OpenCMISS root Iron")
 
@@ -150,8 +177,7 @@ set(OPENCMISS_IRON_ROOT "" CACHE PATH "The location of the OpenCMISS root Iron")
 #
 # The location of the installation for the whole OpenCMISS Zinc installation.
 #
-# Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
-#
+# Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT`, :cmake:`OPENCMISS_LIBRARIES` and :cmake:`OPENCMISS_SETUP_TYPE`
 
 set(OPENCMISS_ZINC_ROOT "" CACHE PATH "The location of the OpenCMISS root Zinc")
 
@@ -164,7 +190,6 @@ set(OPENCMISS_ZINC_ROOT "" CACHE PATH "The location of the OpenCMISS root Zinc")
 # The prefix for the location of the installed OpenCMISS dependencies.
 #
 # Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
-#
 
 set(OPENCMISS_DEPENDENCIES_INSTALL_PREFIX "" CACHE PATH "The prefix for the location of the installed OpenCMISS dependencies")
 
@@ -177,6 +202,5 @@ set(OPENCMISS_DEPENDENCIES_INSTALL_PREFIX "" CACHE PATH "The prefix for the loca
 # The prefix for the location of the installed OpenCMISS dependencies.
 #
 # Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
-#
 
 set(OPENCMISS_CMAKE_MODULES_INSTALL_PREFIX "" CACHE PATH "The prefix for the location of the installed OpenCMISS CMake modules")

@@ -16,7 +16,7 @@ set(OPENCMISS_VERSION "develop" CACHE STRING "The branch or tag to setup.  Must 
 # .. _`opencmiss_setup_type`:
 #
 # OPENCMISS_SETUP_TYPE
-# -----------------
+# --------------------
 #
 # Set the type of OpenCMISS installation to create installation for.  The value of this variable must be one of
 # the known OpenCMISS setup types [|default|, libraries, dependencies, cmake_modules].

@@ -4,6 +4,7 @@
 OpenCMISS Libraries Setup Build Script - Command Line
 =====================================================
 
+Follow the appropriate instructions for your platform below.
 
 .. toctree::
    :maxdepth: 2

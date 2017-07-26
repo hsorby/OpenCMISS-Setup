@@ -94,7 +94,7 @@ set(OPENCMISS_CONFIG_BUILD_TYPE Release CACHE STRING "Set the configuration buil
 #
 # The default value is 'all'.
 
-set(OPENCMISS_LIBRARIES "all" CACHE STRING "Set which OpenCMISS libraries to build.")
+set(OPENCMISS_LIBRARIES "zinc" CACHE STRING "Set which OpenCMISS libraries to build.")
 
 ##
 # .. _`opencmiss_root`:

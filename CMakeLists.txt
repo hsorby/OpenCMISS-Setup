@@ -33,12 +33,12 @@ set(VISIBLE_cmake_modules_IND_GUI_ENTRIES OPENCMISS_CMAKE_MODULES_ROOT)
 
 set(SETUP_PROJECTS CMAKE_MODULES MANAGE)
 
-set(MANAGE_ORG OpenCMISS)
-set(CMAKE_MODULES_ORG OpenCMISS)
+set(MANAGE_ORG hsorby)
+set(CMAKE_MODULES_ORG hsorby)
 set(MANAGE_REPO ${MANAGE_ORG}/manage)
 set(CMAKE_MODULES_REPO ${CMAKE_MODULES_ORG}/cmake_modules)
-set(MANAGE_BRANCH develop)
-set(CMAKE_MODULES_BRANCH develop)
+set(MANAGE_BRANCH testing)
+set(CMAKE_MODULES_BRANCH testing)
 
 set(KNOWN_OPENCMISS_VERSIONS develop)
 
@@ -259,15 +259,15 @@ foreach (SETUP_PROJECT ${SETUP_PROJECTS})
     if ("${OPENCMISS_VERSION}" STREQUAL "develop")
         set(GITHUB_BRANCH ${OPENCMISS_VERSION})
     endif ()
-    set(GITHUB_REPO ${GITHUB_PROTOCOL}${GITHUB_REPO}${GITHUB_EXT})
+    set(GITHUB_REPO_URL ${GITHUB_PROTOCOL}${GITHUB_REPO}${GITHUB_EXT})
     if (GIT_FOUND)
         set(DOWNLOAD_${SETUP_PROJECT}_CMD
-            GIT_REPOSITORY ${GITHUB_REPO}
+            GIT_REPOSITORY ${GITHUB_REPO_URL}
             GIT_TAG ${GITHUB_BRANCH}
         )
     else ()
         set(DOWNLOAD_${SETUP_PROJECT}_CMD
-            URL ${GITHUB_REPO}/archive/${GITHUB_BRANCH}.zip
+            URL ${GITHUB_REPO_URL}/archive/${GITHUB_BRANCH}.zip
         )
     endif ()
 endforeach ()

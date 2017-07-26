@@ -284,6 +284,8 @@ if (NOT ${OPENCMISS_SETUP_TYPE} STREQUAL libraries)
     )
 endif ()
 
+message(STATUS "--------------------------------------")
+message(STATUS "DOWNLOAD_MANAGE_CMD: ${DOWNLOAD_MANAGE_CMD}")
 if (NOT ${OPENCMISS_SETUP_TYPE} STREQUAL cmake_modules)
     ExternalProject_Add(setup_manage
         DEPENDS setup_modules

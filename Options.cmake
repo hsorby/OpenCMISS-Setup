@@ -121,6 +121,18 @@ set(OPENCMISS_ROOT "" CACHE PATH "The location of the OpenCMISS root root")
 set(OPENCMISS_LIBRARIES_ROOT "" CACHE PATH "The location of the OpenCMISS root libraries")
 
 ##
+# .. _`opencmiss_examples_root`:
+#
+# OPENCMISS_EXAMPLES_ROOT
+# ------------------------
+#
+# The location of the installation for the OpenCMISS examples.
+#
+# Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
+
+set(OPENCMISS_EXAMPLES_ROOT "" CACHE PATH "The location of the OpenCMISS root examples")
+
+##
 # .. _`opencmiss_dependencies_root`:
 #
 # OPENCMISS_DEPENDENCIES_ROOT

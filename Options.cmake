@@ -19,11 +19,11 @@ set(OPENCMISS_VERSION "develop" CACHE STRING "The branch or tag to setup.  Must 
 # --------------------
 #
 # Set the type of OpenCMISS installation to create installation for.  The value of this variable must be one of
-# the known OpenCMISS setup types [|default|, libraries, dependencies, cmake_modules].
+# the known OpenCMISS setup types [|standard|, libraries, dependencies, cmake_modules].
 #
-# The default value is 'default'.
+# The default value is 'standard'.
 
-set(OPENCMISS_SETUP_TYPE "default" CACHE STRING "The type of OpenCMISS installation to setup.")
+set(OPENCMISS_SETUP_TYPE "standard" CACHE STRING "The type of OpenCMISS installation to setup.")
 
 ##
 # .. _`opencmiss_independent`:
@@ -94,7 +94,7 @@ set(OPENCMISS_CONFIG_BUILD_TYPE Release CACHE STRING "Set the configuration buil
 #
 # The default value is 'all'.
 
-set(OPENCMISS_LIBRARIES "all" CACHE STRING "Set which OpenCMISS libraries to build.")
+set(OPENCMISS_LIBRARIES "zinc" CACHE STRING "Set which OpenCMISS libraries to build.")
 
 ##
 # .. _`opencmiss_root`:
@@ -119,6 +119,18 @@ set(OPENCMISS_ROOT "" CACHE PATH "The location of the OpenCMISS root root")
 # Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
 
 set(OPENCMISS_LIBRARIES_ROOT "" CACHE PATH "The location of the OpenCMISS root libraries")
+
+##
+# .. _`opencmiss_examples_root`:
+#
+# OPENCMISS_EXAMPLES_ROOT
+# ------------------------
+#
+# The location of the installation for the OpenCMISS examples.
+#
+# Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
+
+set(OPENCMISS_EXAMPLES_ROOT "" CACHE PATH "The location of the OpenCMISS root examples")
 
 ##
 # .. _`opencmiss_dependencies_root`:

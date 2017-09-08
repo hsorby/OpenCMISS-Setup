@@ -205,14 +205,3 @@ set(OPENCMISS_ZINC_ROOT "" CACHE PATH "The location of the OpenCMISS root Zinc")
 
 set(OPENCMISS_DEPENDENCIES_INSTALL_PREFIX "" CACHE PATH "The prefix for the location of the installed OpenCMISS dependencies")
 
-##
-# .. _`opencmiss_cmake_modules_install_prefix`:
-#
-# OPENCMISS_CMAKE_MODULES_INSTALL_PREFIX
-# --------------------------------------
-#
-# The prefix for the location of the installed OpenCMISS dependencies.
-#
-# Visibility of this variable is subject to the values of :cmake:`OPENCMISS_INDEPENDENT` and :cmake:`OPENCMISS_SETUP_TYPE`
-
-set(OPENCMISS_CMAKE_MODULES_INSTALL_PREFIX "" CACHE PATH "The prefix for the location of the installed OpenCMISS CMake modules")

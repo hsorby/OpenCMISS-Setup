@@ -329,8 +329,12 @@ endforeach ()
 
 set(_DEPENDS_MODULES)
 if (NOT OPENCMISS_SETUP_TYPE STREQUAL "libraries")
-    set(_DEPENDS_MODULES DEPENDS setup_modules)
-    ExternalProject_Add(setup_modules
+    if (EXISTS ${OPENCMISS_CMAKE_MODULES_SOURCE_DIR}/CMakeLists.txt)
+        message(STATUS "Disabling download of cmake modules.")
+        unset(DOWNLOAD_CMAKE_MODULES_CMD)
+    endif ()
+    set(_DEPENDS_MODULES DEPENDS setup_cmake_modules)
+    ExternalProject_Add(setup_cmake_modules
         ${DOWNLOAD_CMAKE_MODULES_CMD}
         SOURCE_DIR "${OPENCMISS_CMAKE_MODULES_SOURCE_DIR}"
         BINARY_DIR "${OPENCMISS_CMAKE_MODULES_BINARY_DIR}"
@@ -342,6 +346,10 @@ if (NOT OPENCMISS_SETUP_TYPE STREQUAL "libraries")
 endif ()
 
 if (NOT OPENCMISS_SETUP_TYPE STREQUAL "cmake_modules")
+    if (EXISTS ${OPENCMISS_MANAGE_SOURCE_DIR}/CMakeLists.txt)
+        message(STATUS "Disabling download of manage.")
+        unset(DOWNLOAD_MANAGE_CMD)
+    endif ()
     ExternalProject_Add(setup_manage
         ${_DEPENDS_MODULES}
         ${DOWNLOAD_MANAGE_CMD}

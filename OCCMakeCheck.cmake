@@ -17,7 +17,7 @@ if (NOT ${_HTTPS_CHECK_VAR})
     message(STATUS "Checking CMake-${CMAKE_VERSION} HTTPS support ...")
     set(CMAKE_HTTPS_TEST_URL "https://raw.githubusercontent.com/OpenCMISS/manage/v1.0/README.rst")
     set(CMAKE_HTTPS_TEST_DOWNLOAD_PATH "${CMAKE_CURRENT_BINARY_DIR}/cmake_https_test_download.txt")
-    file(DOWNLOAD ${CMAKE_HTTPS_TEST_URL} ${CMAKE_HTTPS_TEST_DOWNLOAD_PATH} STATUS https_status TIMEOUT 60 INACTIVITY_TIMEOUT 60)
+    file(DOWNLOAD ${CMAKE_HTTPS_TEST_URL} ${CMAKE_HTTPS_TEST_DOWNLOAD_PATH} STATUS https_status TIMEOUT 6 INACTIVITY_TIMEOUT 6)
     list(GET https_status 0 HTTPS_TEST_DOWNLOAD_ERROR_CODE)
     list(GET https_status 1 HTTPS_TEST_DOWNLOAD_ERROR_STRING)
     # https download was successful

@@ -360,6 +360,15 @@ if (NOT OPENCMISS_SETUP_TYPE STREQUAL "cmake_modules")
         BUILD_COMMAND "${MANAGE_BUILD_CMD}"
         INSTALL_COMMAND "${MANAGE_INSTALL_CMD}"
     )
+    if (NOT OPENCMISS_SETUP_TYPE STREQUAL "dependencies")
+        add_custom_target(keytests
+            DEPENDS setup_manage
+            COMMAND ${CMAKE_COMMAND} --build . --target keytests --config $<CONFIG>
+            COMMENT "Running keytests"
+            WORKING_DIRECTORY ${OPENCMISS_MANAGE_BINARY_DIR}
+            VERBATIM
+        )
+    endif ()
 endif ()
 
 set(PRINT_SUMMARY TRUE)

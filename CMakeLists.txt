@@ -304,7 +304,7 @@ if (OPENCMISS_PERFORM_INITIAL_BUILD)
         #list(APPEND MANAGE_CONFIGURE_ARGS -DOPENCMISS_CMAKE_MODULES_ROOT=${OPENCMISS_CMAKE_MODULES_ROOT})
         message(FATAL_ERROR "This case is not handled when performing initial build: ${OPENCMISS_SETUP_TYPE} [ind=${OPENCMISS_INDEPENDENT}], something has gone wrong!")
     endif ()
-    set(MANAGE_BUILD_CMD ${CMAKE_COMMAND} --build . --target do_config ${MULTICONFIG_BUILD_CONFIG})
+    set(MANAGE_BUILD_CMD ${CMAKE_COMMAND} --build . ${MULTICONFIG_BUILD_CONFIG})
     # set(MANAGE_BUILD_CMD "") # Remove me soon
 endif ()
 
